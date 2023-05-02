@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    app: mysql_db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql_db
+  template:
+    metadata:
+      labels:
+        app: mysql_db
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:5.7
+        ports:
+        - containerPort: 3306
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: "Password123"
+          - name: MYSQL_USER
+            value: "phonebook-user"
+          - name: MYSQL_PASSWORD
+            value: "Phonebookpass123"
+          - name: MYSQL_DATABASE
+            value: "phonebook"
+        volumeMounts:
+        - name: phonebook-volume
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: phonebook-volume
+        persistentVolumeClaim:
+          claimName: mypvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  labels:
+    app: mysql-service
+spec:
+  selector:
+    app: mysql_db
+  type: ClusterIP
+  ports:
+  - port: 3306
+    targetPort: 3306
+
