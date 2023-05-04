@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: result-server
+  labels:
+    app: result-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: result-server
+  template:
+    metadata:
+      labels:
+        app: result-server
+    spec:
+      containers:
+      - name: result-server
+        image: eakkaya64/result-server
+        ports:
+        - containerPort: 80
+        envFrom:
+          - configMapRef:
+            name: server-configmap
+        env:
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secret
+                key: mysql_password
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: resultserver-service
+  labels:
+    app: resultserver-service
+spec:
+  selector:
+    app: result-server
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30002

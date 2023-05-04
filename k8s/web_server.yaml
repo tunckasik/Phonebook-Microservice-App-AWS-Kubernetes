@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-server
+  labels:
+    app: web-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-server
+  template:
+    metadata:
+      labels:
+        app: web-server
+    spec:
+      containers:
+      - name: webserver
+        image: alitunckasik/phonebook-bronze-app-web
+        ports:
+        - containerPort: 80
+        env:
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secret
+                key: mysql_password
+        envFrom:
+          - configMapRef:
+            name: server-configmap
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webserver-service
+  labels:
+    app: webserver-service
+spec:
+  selector:
+    app: web-server
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30001
