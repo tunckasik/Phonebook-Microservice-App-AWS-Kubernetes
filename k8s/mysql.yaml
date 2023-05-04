@@ -21,13 +21,25 @@ spec:
         - containerPort: 3306
         env:
           - name: MYSQL_ROOT_PASSWORD
-            value: "Password123"
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secret
+                key: mysql_root_password
           - name: MYSQL_USER
-            value: "phonebook-user"
+            valueFrom:
+              secretKeyRef:
+                name: mysql-configmap
+                key: mysql_username
           - name: MYSQL_PASSWORD
-            value: "Phonebookpass123"
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secret
+                key: mysql_password
           - name: MYSQL_DATABASE
-            value: "phonebook"
+            valueFrom:
+              secretKeyRef:
+                name: mysql-configmap
+                key: mysql_database
         volumeMounts:
         - name: phonebook-volume
           mountPath: /var/lib/mysql
